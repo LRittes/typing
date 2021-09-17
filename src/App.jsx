@@ -21,11 +21,25 @@ const isValidKey = (key, word) => {
 const App = () => {
     const [typedKeys, setTypedKeys] = useState([])
     const [validKeys, setValidKeys] = useState([])
+    const [completedWord, setCompletedWords] = useState([])
     const [word, setWord] = useState('')
 
     useEffect(() => {
         setWord(getWord())
     }, [])
+
+    useEffect(() => {
+        const wordFromValidKeys = validKeys.join('')
+        if(word && word === wordFromValidKeys){
+            let newWord = null
+            do {
+                newWord = getWord()
+            } while (completedWord.includes(newWord));
+            setWord(newWord)
+            setValidKeys([])
+            setCompletedWords(prev => [...prev, word])
+        }
+    }, [word, validKeys, completedWord])
 
     const handleKeydown = (e) => {
         e.preventDefault()
@@ -50,9 +64,7 @@ const App = () => {
             <div className="typed-keys">{typedKeys ? typedKeys.join(' ') : null}</div>
             <div className="completed-words">
                 <ol>
-                    <li>cidade</li>
-                    <li>carro</li>
-                    <li>puta</li>
+                    {completedWord.map(word => <li key={word}>{word}</li>)}
                 </ol>
             </div>
             <GlobalStyles/>
